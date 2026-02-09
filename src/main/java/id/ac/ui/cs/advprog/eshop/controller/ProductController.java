@@ -35,4 +35,10 @@ public class ProductController {
         model.addAttribute("products", allProducts);
         return "productList";
     }
+
+    @PostMapping("/delete")
+    public String deleteProduct(@ModelAttribute Product product) {
+        service.delete(product);
+        return "redirect:/product/list";
+    }
 }
