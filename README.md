@@ -1,20 +1,44 @@
-## REFLEKSI 1
-Sesuai dengan yang sudah diajarkan, saya membuat fitur 
-edit dan delete product menggunakan Springboot dengan arsitektur 
-yang terdiri dari Controller, Service, dan Repository. 
-Struktur ini membuat flow kode lebih mudah dipahami. 
+### REFLEKSI 1
 
-Saat mengembangkan fitur edit dan delete,
-saya mengimplementasikan **clean code** seperti:
-1. Setiap layer struktur memiliki fungsi yang jelas. 
-Dimana controller menangani request, service menangani logika, 
-dan repository menangani data. 
-2. Penamaan masing-masing class dan function jelas dan self explanatory
-3. Setiap metode jelas dan hanya menangani satu tugas utama
-4. Terdapat unit dan functional testing untuk memastikan fitur berjalan dengan lancar
+Sesuai dengan yang sudah diajarkan, saya membuat fitur edit dan delete product menggunakan
+Spring Boot dengan arsitektur yang terdiri dari Controller, Service, dan Repository.
+Struktur ini membuat flow kode lebih mudah dipahami.
 
-Selain itu, saya menerapkan **secure coding** yaitu 
-1. Penggunaan UUID yang membuat id dibuat otomatis sehingga 
-mengurangi risiko duplicates 
-2. Data diakses melalui service jadi controller tidak langsung
-mengakses data
+Saat mengembangkan fitur edit dan delete, saya mengimplementasikan **clean code** seperti:
+
+1. Setiap layer struktur memiliki fungsi yang jelas, di mana controller menangani request,
+   service menangani logika, dan repository menangani data.
+2. Penamaan masing-masing class dan function jelas dan self explanatory.
+3. Setiap metode jelas dan hanya menangani satu tugas utama.
+4. Terdapat unit dan functional testing untuk memastikan fitur berjalan dengan lancar.
+
+Selain itu, saya menerapkan **secure coding** yaitu:
+
+1. Penggunaan UUID yang membuat ID dibuat otomatis sehingga mengurangi risiko duplicates.
+2. Data diakses melalui service sehingga controller tidak langsung mengakses data.
+
+---
+
+### REFLEKSI 2
+
+***After writing the unit test, how do you feel?***
+Saya merasa lebih yakin bahwa program yang dibuat berjalan dengan baik.
+
+***How many unit tests should be made in a class? How to make sure that our unit tests are enough?***
+Banyaknya unit test tergantung dengan class yang ada, tetapi agar aman biasanya meng-cover
+beberapa kasus seperti success, failed, dan edge case lainnya yang mungkin ada.
+
+***Does 100% code coverage mean no bugs?***
+Walaupun mencapai 100% coverage, ini tidak menjamin bahwa program tidak terdapat bug.
+Masih mungkin terdapat logical error, kesalahan desain, atau kasus yang belum terpikirkan
+dalam pengujian. Bahkan mungkin terdapat kesalahan juga dalam testing-nya.
+
+***Cleanliness of New Functional Test Suite:***
+Jika dibuat functional test baru, kemungkinan besar akan terjadi pengulangan kode,
+terutama pada bagian setup seperti konfigurasi `baseUrl` dan inisialisasi driver. Hal ini
+dapat menyebabkan duplikasi kode, kurangnya reusabilitas, dan meningkatnya kompleksitas
+program.
+
+***Improvements:***
+Untuk menjaga kebersihan kode, beberapa perbaikan yang dapat dilakukan adalah membuat
+kelas dasar untuk setup umum, menggunakan helper method, dan mengurangi duplikasi kode.
