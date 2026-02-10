@@ -177,4 +177,76 @@ class ProductRepositoryTest {
 
         assertNull(result);
     }
+
+    @Test
+    void testEditProductWhenOtherProductsExist() {
+        Product product1 = new Product();
+        product1.setProductName("A");
+        product1.setProductQuantity(1);
+
+        Product product2 = new Product();
+        product2.setProductName("B");
+        product2.setProductQuantity(2);
+
+        productRepository.create(product1);
+        productRepository.create(product2);
+
+        Product update = new Product();
+        update.setProductId("non-existing-id");
+        update.setProductName("X");
+        update.setProductQuantity(99);
+
+        Product result = productRepository.edit(update);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testDeleteWhenOtherProductsExist() {
+        Product product1 = new Product();
+        product1.setProductName("A");
+        product1.setProductQuantity(1);
+
+        Product product2 = new Product();
+        product2.setProductName("B");
+        product2.setProductQuantity(2);
+
+        productRepository.create(product1);
+        productRepository.create(product2);
+
+        Product fake = new Product();
+        fake.setProductId("non-existing-id");
+
+        Product result = productRepository.delete(fake);
+
+        assertNull(result);
+
+        Iterator<Product> iterator = productRepository.findAll();
+
+        assertTrue(iterator.hasNext());
+        iterator.next();
+
+        assertTrue(iterator.hasNext());
+    }
+
+    @Test
+    void testGetProductByIdWhenNotFirstElement() {
+
+        Product product1 = new Product();
+        product1.setProductName("First");
+        product1.setProductQuantity(1);
+
+        Product product2 = new Product();
+        product2.setProductName("Second");
+        product2.setProductQuantity(2);
+
+        Product saved1 = productRepository.create(product1);
+        Product saved2 = productRepository.create(product2);
+
+        Product result =
+                productRepository.getProductById(saved2.getProductId());
+
+        assertNotNull(result);
+        assertEquals("Second", result.getProductName());
+    }
 }
