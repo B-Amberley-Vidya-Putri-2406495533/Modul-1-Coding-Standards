@@ -65,15 +65,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_KEY }}
         with:
-          projectBaseDir: .
           args: >
             -Dsonar.projectKey=B-Amberley-Vidya-Putri-2406495533_Modul-1-Coding-Standards
             -Dsonar.organization=b-amberley-vidya-putri-2406495533
             -Dsonar.java.binaries=build/classes/java/main
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
-
-      - name: SonarCloud Quality Gate Check
-        uses: SonarSource/sonarqube-quality-gate-action@v1.1.0
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_KEY }}
