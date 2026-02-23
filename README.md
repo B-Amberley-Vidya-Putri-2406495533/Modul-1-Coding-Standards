@@ -52,9 +52,12 @@ kelas dasar untuk setup umum, menggunakan helper method, dan mengurangi duplikas
    because it’s a standard Spring Boot “context loads” test but to fix it I added a clear 
    comment explaining that its job is to verify the Spring context can start successfully. 
    My strategy was to read the issue see the fix, and add a simple comment explaining what it does 
-   and later when i pushed it again, the issue was no longer there
-   There were other issues but it was irrelevant because the issue was in the scoreboard code 
-   where it came directly from github
+   and later when i pushed it again, the issue was no longer there.
+   There were also several other issues reported by SonarCloud during the analysis process. 
+   However, some of those issues were related to the scoreboard code that originated directly 
+   from the provided GitHub template. Since those parts were not modified and were outside the scope 
+   of the implemented functionality, i consider them irrelevant and were not addressed.
+
 
 2) ***Does my CI/CD meet Continuous Integration and Continuous Deployment?***
 
@@ -62,3 +65,5 @@ kelas dasar untuk setup umum, menggunakan helper method, dan mengurangi duplikas
    triggers the workflows to build the project, run unit tests, and produce coverage reports. 
    It also meets Continuous Deployment because after changes are merged to main branch, Koyeb automatically 
    pulls the latest code and redeploys the application.
+
+**LINK DEPLOYMENT:** https://dependent-haleigh-b-amberley-vidya-putri-2406495533-665252ef.koyeb.app/
