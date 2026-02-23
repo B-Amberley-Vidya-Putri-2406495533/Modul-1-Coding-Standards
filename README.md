@@ -42,3 +42,23 @@ program.
 ***Improvements:***
 Untuk menjaga kebersihan kode, beberapa perbaikan yang dapat dilakukan adalah membuat
 kelas dasar untuk setup umum, menggunakan helper method, dan mengurangi duplikasi kode.
+
+---
+### REFLEKSI MODULE 2
+1) ***Code quality issues I fixed and my strategy***
+
+   Issue 1: Empty test method (java:S1186: “Methods should not be empty”)
+   in `EshopApplicationTests.contextLoads()`, I kept the method empty on purpose 
+   because it’s a standard Spring Boot “context loads” test but to fix it I added a clear 
+   comment explaining that its job is to verify the Spring context can start successfully. 
+   My strategy was to read the issue see the fix, and add a simple comment explaining what it does 
+   and later when i pushed it again, the issue was no longer there
+   There were other issues but it was irrelevant because the issue was in the scoreboard code 
+   where it came directly from github
+
+2) ***Does my CI/CD meet Continuous Integration and Continuous Deployment?***
+
+   Yes, the current setup meets Continuous Integration because every push and pull request automatically 
+   triggers the workflows to build the project, run unit tests, and produce coverage reports. 
+   It also meets Continuous Deployment because after changes are merged to main branch, Koyeb automatically 
+   pulls the latest code and redeploys the application.
