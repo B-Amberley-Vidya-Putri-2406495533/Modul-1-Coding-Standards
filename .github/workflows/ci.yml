@@ -6,18 +6,67 @@ on:
 
 jobs:
   test:
-    name: Run tests
+    name: Run Tests
     runs-on: ubuntu-22.04
+
     steps:
       - name: Check out the Git repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Java toolchain
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "21"
-          cache: "gradle"
+          distribution: temurin
+          java-version: 21
+          cache: gradle
 
-      - name: Run unit tests
-        run: ./gradlew test
+      - name: Run unit tests and generate coverage
+        run: ./gradlew clean test jacocoTestReport
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+
+  sonar:
+    name: SonarCloud Scan
+    runs-on: ubuntu-22.04
+    needs: test
+
+    steps:
+      - name: Check out the Git repository
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: build/
+
+      - name: Set up Java toolchain
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_KEY }}
+        with:
+          args: >
+            -Dsonar.projectKey=B-Amberley-Vidya-Putri-2406495533_Modul-1-Coding-Standards
+            -Dsonar.organization=b-amberley-vidya-putri-2406495533
+            -Dsonar.java.binaries=build/classes/java/main
+            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
