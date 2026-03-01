@@ -2,6 +2,8 @@ package id.ac.ui.cs.advprog.eshop.controller;
 
 import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.service.ProductService;
+import id.ac.ui.cs.advprog.eshop.service.CarServiceImpl;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,7 +23,10 @@ class ProductControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private ProductService productService;
+    private ProductService service;
+
+    @MockBean
+    private CarServiceImpl carService;
 
     @Test
     void productList_success() throws Exception {
@@ -31,8 +36,7 @@ class ProductControllerTest {
         product.setProductName("Laptop");
         product.setProductQuantity(10);
 
-        when(productService.findAll())
-                .thenReturn(List.of(product));
+        when(service.findAll()).thenReturn(List.of(product));
 
         mockMvc.perform(get("/product/list"))
                 .andExpect(status().isOk())
@@ -63,6 +67,11 @@ class ProductControllerTest {
     @Test
     void deleteProduct_success() throws Exception {
 
+        Product product = new Product();
+        product.setProductId("1");
+
+        when(service.getProductById("1")).thenReturn(product);
+
         mockMvc.perform(post("/product/delete")
                         .param("productId", "1"))
                 .andExpect(status().is3xxRedirection())
@@ -77,8 +86,7 @@ class ProductControllerTest {
         product.setProductName("Laptop");
         product.setProductQuantity(10);
 
-        when(productService.getProductById("1"))
-                .thenReturn(product);
+        when(service.getProductById("1")).thenReturn(product);
 
         mockMvc.perform(get("/product/edit/1"))
                 .andExpect(status().isOk())
@@ -89,8 +97,7 @@ class ProductControllerTest {
     @Test
     void editProductPage_notFound() throws Exception {
 
-        when(productService.getProductById("99"))
-                .thenReturn(null);
+        when(service.getProductById("99")).thenReturn(null);
 
         mockMvc.perform(get("/product/edit/99"))
                 .andExpect(status().is3xxRedirection())
