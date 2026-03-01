@@ -70,6 +70,8 @@ kelas dasar untuk setup umum, menggunakan helper method, dan mengurangi duplikas
 
 ---
 ### REFLEKSI MODULE 3
+#### 1. Principles i applied:
+
 **SRP (Single Responsibility Principle):** a class should have only one responsibility or one reason to change. 
 At first, ProductController and CarController were defined in the same file where the file handled both product 
 and car management. This violated SRP because changes to car functionality would require modifying the same file 
@@ -102,3 +104,34 @@ and query operations (findAll, getProductById).
 
 - Fix: i seperate interface into more interfaces. ProductQueryService for read operations and 
 ProductCommandService for write operations.
+
+#### 2. Advantages of applying SOLID principles
+- SRP makes the code easier to maintain because each class focuses on one responsibility. 
+For example, separating ProductController and CarController makes it easier to update product logic 
+without affecting car functionality.
+- DIP makes components less dependent on each other. For example, CarController now depends on the CarService 
+interface instead of CarServiceImpl. This makes it easier to change the implementation in the future 
+without modifying the controller.
+- OCP allows the project to grow without changing existing code. 
+For example, if a new entity such as Bike needs to be added, developers can create BikeController, 
+BikeService, and BikeRepository without modifying the existing product or car classes.
+- ISP makes interfaces simpler and easier to use. splitting ProductService into ProductQueryService and 
+ProductCommandService make classes only depend on the methods they actually need.
+- LSP make sure that classes have correct relationships. removing the inheritance between CarController and 
+ProductController, each controller behaves correctly according to its role.
+  
+SOLID principles improves the maintainability, flexibility, and readability of the project.
+
+#### 3. disadvantages of not applying SOLID principles
+- without SRP, having ProductController and CarController in the same file would make the code harder to manage. 
+Any change to car functionality could accidentally affect product-related code.
+- Without DIP, CarController would depend directly on CarServiceImpl. 
+If the service implementation changes, the controller would also need to be modified so theres more room for error.
+- Without OCP, adding new features would require modifying existing classes instead of extending them. 
+This increases the chances bugs into previously working code.
+- Without ISP, large interfaces like ProductService would force classes to depend on methods they do not use and 
+the system becomes harder to understand and maintain.
+- Without LSP, incorrect inheritance like CarController extending ProductController could cause design 
+confusion and unexpected behavior in the program.
+
+Not applying SOLID principles makes code more complex, fragile, and harder to maintain.
