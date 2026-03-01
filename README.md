@@ -67,3 +67,38 @@ kelas dasar untuk setup umum, menggunakan helper method, dan mengurangi duplikas
    pulls the latest code and redeploys the application.
 
 **LINK DEPLOYMENT:** https://dependent-haleigh-b-amberley-vidya-putri-2406495533-665252ef.koyeb.app/
+
+---
+### REFLEKSI MODULE 3
+**SRP (Single Responsibility Principle):** a class should have only one responsibility or one reason to change. 
+At first, ProductController and CarController were defined in the same file where the file handled both product 
+and car management. This violated SRP because changes to car functionality would require modifying the same file 
+responsible for product logic.
+
+- Fix: controllers were separated into two files: ProductController.java and CarController.java. 
+Each controller now manages one class with a single responsibility.
+
+**DIP (Dependency Inversion Principle):** high-level modules should depend on abstractions rather than concrete 
+implementations. Before, CarController used CarServiceImpl directly, which made the controller 
+strongly tied to that one implementation.
+
+- Fix: i changed dependency so CarController depends on the CarService interface instead.
+
+**LSP (Liskov Substitution Principle)**: subclasses should be able to replace their superclass without 
+breaking the program. Before, CarController extended ProductController meaning car controller is a 
+type of product controller. But, both controllers manage different entities and behaviors.
+
+- Fix: inheritance relationship was removed and CarController was implemented as an independent 
+controller class.
+
+**OCP (Open/Closed Principle):** software should be open for extension but closed for modification. 
+In this project, controllers depend on service interfaces such as ProductService and CarService.
+The before-solid already fulfills this principal. new functionality can be added by creating new 
+classes without modifying existing ones.
+
+**ISP (Interface Segregation Principle)** : interfaces should be small and focused so that clients only 
+depend on the methods they use. Initially, ProductService contained both command operations (create, edit, delete) 
+and query operations (findAll, getProductById).
+
+- Fix: i seperate interface into more interfaces. ProductQueryService for read operations and 
+ProductCommandService for write operations.
