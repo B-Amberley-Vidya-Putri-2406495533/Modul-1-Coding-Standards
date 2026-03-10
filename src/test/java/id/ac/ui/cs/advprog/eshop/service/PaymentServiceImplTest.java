@@ -1,23 +1,18 @@
 package id.ac.ui.cs.advprog.eshop.service;
 
-import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.enums.OrderStatus;
+import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
 import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.repository.PaymentRepository;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -56,77 +51,176 @@ class PaymentServiceImplTest {
         paymentData = new HashMap<>();
     }
 
+    // ---------------- VOUCHER ----------------
+
     @Test
     void testAddPaymentVoucherValid() {
+
         paymentData.put("voucherCode", "ESHOP1234ABC5678");
-        Payment payment = paymentService.addPayment(
-                order,
-                "VOUCHER_CODE",
-                paymentData
-        );
+
+        Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+
         assertEquals("SUCCESS", payment.getStatus());
+        assertEquals(OrderStatus.SUCCESS.getValue(), order.getStatus());
+
+        verify(paymentRepository).save(payment);
     }
 
     @Test
     void testAddPaymentVoucherInvalid() {
+
         paymentData.put("voucherCode", "INVALID");
-        Payment payment = paymentService.addPayment(
-                order,
-                "VOUCHER_CODE",
-                paymentData
-        );
+
+        Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+
         assertEquals("REJECTED", payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), order.getStatus());
+
+        verify(paymentRepository).save(payment);
     }
+
+    @Test
+    void testAddPaymentVoucherNullCode() {
+
+        Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+
+        assertEquals("REJECTED", payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), order.getStatus());
+
+        verify(paymentRepository).save(payment);
+    }
+
+    // ---------------- COD ----------------
 
     @Test
     void testAddPaymentCashOnDeliveryValid() {
+
         paymentData.put("address", "Jakarta");
         paymentData.put("deliveryFee", "10000");
-        Payment payment = paymentService.addPayment(
-                order,
-                "CASH_ON_DELIVERY",
-                paymentData
-        );
+
+        Payment payment = paymentService.addPayment(order, "CASH_ON_DELIVERY", paymentData);
+
         assertEquals("PENDING", payment.getStatus());
+
+        verify(paymentRepository).save(payment);
     }
 
     @Test
-    void testAddPaymentCashOnDeliveryInvalid() {
+    void testAddPaymentCODInvalidAddress() {
+
         paymentData.put("address", "");
-        Payment payment = paymentService.addPayment(
-                order,
-                "CASH_ON_DELIVERY",
-                paymentData
-        );
+        paymentData.put("deliveryFee", "10000");
+
+        Payment payment = paymentService.addPayment(order, "CASH_ON_DELIVERY", paymentData);
+
         assertEquals("REJECTED", payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), order.getStatus());
+
+        verify(paymentRepository).save(payment);
     }
+
+    @Test
+    void testAddPaymentCODInvalidDeliveryFee() {
+
+        paymentData.put("address", "Jakarta");
+        paymentData.put("deliveryFee", "");
+
+        Payment payment = paymentService.addPayment(order, "CASH_ON_DELIVERY", paymentData);
+
+        assertEquals("REJECTED", payment.getStatus());
+
+        verify(paymentRepository).save(payment);
+    }
+
+    @Test
+    void testAddPaymentCODNullAddress() {
+
+        paymentData.put("deliveryFee", "10000");
+
+        Payment payment = paymentService.addPayment(order, "CASH_ON_DELIVERY", paymentData);
+
+        assertEquals("REJECTED", payment.getStatus());
+
+        verify(paymentRepository).save(payment);
+    }
+
+    @Test
+    void testAddPaymentCODNullDeliveryFee() {
+
+        paymentData.put("address", "Jakarta");
+
+        Payment payment = paymentService.addPayment(order, "CASH_ON_DELIVERY", paymentData);
+
+        assertEquals("REJECTED", payment.getStatus());
+
+        verify(paymentRepository).save(payment);
+    }
+
+    // ---------------- OTHER METHOD ----------------
+
+    @Test
+    void testAddPaymentUnknownMethod() {
+
+        Payment payment = paymentService.addPayment(order, "UNKNOWN", paymentData);
+
+        assertNotNull(payment);
+
+        verify(paymentRepository).save(payment);
+    }
+
+    // ---------------- STATUS ----------------
 
     @Test
     void testSetStatusSuccess() {
+
         Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
+
         paymentService.setStatus(payment, "SUCCESS");
+
         assertEquals(OrderStatus.SUCCESS.getValue(), order.getStatus());
     }
 
     @Test
     void testSetStatusRejected() {
+
         Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
+
         paymentService.setStatus(payment, "REJECTED");
+
         assertEquals(OrderStatus.FAILED.getValue(), order.getStatus());
     }
 
     @Test
-    void testGetPayment() {
+    void testSetStatusOtherValue() {
+
         Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
+
+        paymentService.setStatus(payment, "PENDING");
+
+        assertEquals("PENDING", payment.getStatus());
+    }
+
+    // ---------------- REPOSITORY ----------------
+
+    @Test
+    void testGetPayment() {
+
+        Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
+
         when(paymentRepository.findById(payment.getId())).thenReturn(payment);
+
         Payment result = paymentService.getPayment(payment.getId());
+
         assertEquals(payment.getId(), result.getId());
     }
 
     @Test
     void testGetAllPayments() {
+
         when(paymentRepository.findAll()).thenReturn(List.of());
+
         List<Payment> payments = paymentService.getAllPayments();
+
         assertTrue(payments.isEmpty());
     }
 }

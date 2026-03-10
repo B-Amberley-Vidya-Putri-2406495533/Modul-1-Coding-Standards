@@ -249,4 +249,10 @@ class ProductRepositoryTest {
         assertNotNull(result);
         assertEquals("Second", result.getProductName());
     }
+    @Test
+    void getProductByIdNotFound() {
+        ProductRepository repo = new ProductRepository();
+        Product result = repo.getProductById("unknown");
+        assertNull(result);
+    }
 }

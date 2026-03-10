@@ -3,10 +3,7 @@ package id.ac.ui.cs.advprog.eshop.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,6 +14,7 @@ class PaymentTest {
 
     @BeforeEach
     void setUp() {
+
         paymentData = new HashMap<>();
 
         List<Product> products = new ArrayList<>();
@@ -47,6 +45,38 @@ class PaymentTest {
         assertEquals("VOUCHER_CODE", payment.getMethod());
         assertEquals(order, payment.getOrder());
         assertEquals(paymentData, payment.getPaymentData());
+        assertEquals("PENDING", payment.getStatus());
     }
 
+    @Test
+    void testSetPaymentStatus() {
+
+        paymentData.put("voucherCode", "ESHOP1234ABC5678");
+
+        Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
+
+        payment.setStatus("SUCCESS");
+
+        assertEquals("SUCCESS", payment.getStatus());
+    }
+
+    @Test
+    void testAllGetters() {
+
+        paymentData.put("voucherCode", "ESHOP1234ABC5678");
+
+        Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
+
+        String id = payment.getId();
+        String method = payment.getMethod();
+        Map<String, String> data = payment.getPaymentData();
+        Order retrievedOrder = payment.getOrder();
+        String status = payment.getStatus();
+
+        assertNotNull(id);
+        assertEquals("VOUCHER_CODE", method);
+        assertEquals(paymentData, data);
+        assertEquals(order, retrievedOrder);
+        assertEquals("PENDING", status);
+    }
 }

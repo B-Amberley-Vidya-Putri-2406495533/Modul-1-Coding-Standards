@@ -107,4 +107,35 @@ class OrderControllerFunctionalTest {
                 .andExpect(view().name("order/payOrderResult"))
                 .andExpect(model().attributeExists("paymentId"));
     }
+
+    @Test
+    void testCreateOrderPost() throws Exception {
+
+        mockMvc.perform(post("/order/create")
+                        .param("author", "aku")
+                        .param("productName", "Test Product")
+                        .param("productQuantity", "2"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/order/history"));
+    }
+
+    @Test
+    void testPayOrderPostWithExtraParams() throws Exception {
+        when(orderService.findById("order-123")).thenReturn(order);
+
+        Map<String,String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode","ESHOP1234ABC5678");
+
+        Payment payment = new Payment(order,"VOUCHER_CODE",paymentData);
+
+        when(paymentService.addPayment(any(Order.class),eq("VOUCHER_CODE"),any(Map.class)))
+                .thenReturn(payment);
+
+        mockMvc.perform(post("/order/pay/order-123")
+                        .param("method","VOUCHER_CODE")
+                        .param("voucherCode","ESHOP1234ABC5678")
+                        .param("extra","value"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("order/payOrderResult"));
+    }
 }

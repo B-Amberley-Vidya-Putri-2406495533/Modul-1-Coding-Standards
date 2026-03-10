@@ -118,4 +118,32 @@ class PaymentControllerFunctionalTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/payment/admin/detail/" + payment.getId()));
     }
+
+    @Test
+    void testPaymentDetailFormEmptyParam() throws Exception {
+        mockMvc.perform(get("/payment/detail")
+                        .param("paymentId",""))
+                .andExpect(status().isOk())
+                .andExpect(view().name("payment/paymentDetailForm"));
+    }
+
+    @Test
+    void testAdminPaymentListEmpty() throws Exception {
+        when(paymentService.getAllPayments()).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get("/payment/admin/list"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("payment/paymentAdminList"))
+                .andExpect(model().attributeExists("payments"));
+    }
+
+    @Test
+    void testPaymentDetailNotFound() throws Exception {
+
+        when(paymentService.getPayment("unknown")).thenReturn(null);
+
+        mockMvc.perform(get("/payment/detail/unknown"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/payment/detail"));
+    }
 }

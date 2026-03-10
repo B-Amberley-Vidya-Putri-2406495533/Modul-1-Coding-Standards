@@ -27,6 +27,11 @@ public class PaymentController {
     @GetMapping("/detail/{paymentId}")
     public String paymentDetail(@PathVariable String paymentId, Model model) {
         Payment payment = paymentService.getPayment(paymentId);
+
+        if (payment == null) {
+            return "redirect:/payment/detail";
+        }
+
         model.addAttribute("payment", payment);
         return "payment/paymentDetail";
     }

@@ -1,27 +1,23 @@
 package id.ac.ui.cs.advprog.eshop.service;
 
+import id.ac.ui.cs.advprog.eshop.enums.OrderStatus;
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Product;
-import id.ac.ui.cs.advprog.eshop.enums.OrderStatus;
 import id.ac.ui.cs.advprog.eshop.repository.OrderRepository;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class OrderServiceTest {
+class OrderServiceImplTest {
 
     @InjectMocks
     OrderServiceImpl orderService;
@@ -29,122 +25,102 @@ class OrderServiceTest {
     @Mock
     OrderRepository orderRepository;
 
-    List<Order> orders;
+    Order order;
+    List<Product> products;
 
     @BeforeEach
     void setUp() {
-        List<Product> products = new ArrayList<>();
 
-        Product product1 = new Product();
-        product1.setProductId("eb558e9f-1c39-460e-8860-71af6af63bd6");
-        product1.setProductName("Sampo Cap Bambang");
-        product1.setProductQuantity(2);
+        products = new ArrayList<>();
 
-        products.add(product1);
+        Product product = new Product();
+        product.setProductId("product-1");
+        product.setProductName("Sample Product");
+        product.setProductQuantity(2);
 
-        orders = new ArrayList<>();
+        products.add(product);
 
-        Order order1 = new Order(
-                "13652556-012a-4c07-b546-54eb1396d79b",
+        order = new Order(
+                "order-1",
                 products,
                 1708560000L,
-                "Safira Sudrajat"
+                "Safira"
         );
-
-        orders.add(order1);
-
-        Order order2 = new Order(
-                "7f9e15bb-4b15-42f4-aebc-c3af385fb078",
-                products,
-                1708570000L,
-                "Safira Sudrajat"
-        );
-
-        orders.add(order2);
     }
 
     @Test
-    void testCreateOrder() {
-        Order order = orders.get(1);
+    void testCreateOrderSuccess() {
 
-        doReturn(order).when(orderRepository).save(order);
+        when(orderRepository.findById(order.getId())).thenReturn(null);
+        when(orderRepository.save(order)).thenReturn(order);
 
         Order result = orderService.createOrder(order);
 
-        verify(orderRepository, times(1)).save(order);
-
+        assertNotNull(result);
         assertEquals(order.getId(), result.getId());
+
+        verify(orderRepository).save(order);
     }
 
     @Test
-    void testCreateOrderIfAlreadyExists() {
-        Order order = orders.get(1);
+    void testCreateOrderAlreadyExists() {
 
-        doReturn(order).when(orderRepository).findById(order.getId());
+        when(orderRepository.findById(order.getId())).thenReturn(order);
 
-        assertNull(orderService.createOrder(order));
+        Order result = orderService.createOrder(order);
 
-        verify(orderRepository, times(0)).save(order);
+        assertNull(result);
+
+        verify(orderRepository, never()).save(any());
     }
 
     @Test
-    void testUpdateStatus() {
-        Order order = orders.get(1);
+    void testUpdateStatusSuccess() {
 
-        Order newOrder = new Order(
-                order.getId(),
-                order.getProducts(),
-                order.getOrderTime(),
-                order.getAuthor(),
-                OrderStatus.SUCCESS.getValue()
-        );
-
-        doReturn(order).when(orderRepository).findById(order.getId());
-        doReturn(newOrder).when(orderRepository).save(any(Order.class));
+        when(orderRepository.findById(order.getId())).thenReturn(order);
+        when(orderRepository.save(any(Order.class))).thenReturn(order);
 
         Order result = orderService.updateStatus(
                 order.getId(),
                 OrderStatus.SUCCESS.getValue()
         );
 
-        assertEquals(order.getId(), result.getId());
         assertEquals(OrderStatus.SUCCESS.getValue(), result.getStatus());
 
-        verify(orderRepository, times(1)).save(any(Order.class));
+        verify(orderRepository).save(any(Order.class));
     }
 
     @Test
     void testUpdateStatusInvalidStatus() {
-        Order order = orders.get(1);
 
-        doReturn(order).when(orderRepository).findById(order.getId());
+        when(orderRepository.findById(order.getId())).thenReturn(order);
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> orderService.updateStatus(order.getId(), "MEOW")
+                () -> orderService.updateStatus(order.getId(), "INVALID")
         );
 
-        verify(orderRepository, times(0)).save(any(Order.class));
+        verify(orderRepository, never()).save(any());
     }
 
     @Test
-    void testUpdateStatusInvalidOrderId() {
+    void testUpdateStatusOrderNotFound() {
 
-        doReturn(null).when(orderRepository).findById("zczc");
+        when(orderRepository.findById("unknown")).thenReturn(null);
 
         assertThrows(
                 NoSuchElementException.class,
-                () -> orderService.updateStatus("zczc", OrderStatus.SUCCESS.getValue())
+                () -> orderService.updateStatus(
+                        "unknown",
+                        OrderStatus.SUCCESS.getValue()
+                )
         );
-
-        verify(orderRepository, times(0)).save(any(Order.class));
     }
 
     @Test
-    void testFindByIdIfIdFound() {
-        Order order = orders.get(1);
+    void testFindByIdFound() {
 
-        doReturn(order).when(orderRepository).findById(order.getId());
+        when(orderRepository.findById(order.getId())).thenReturn(order);
 
         Order result = orderService.findById(order.getId());
 
@@ -152,39 +128,35 @@ class OrderServiceTest {
     }
 
     @Test
-    void testFindByIdIfIdNotFound() {
+    void testFindByIdNotFound() {
 
-        doReturn(null).when(orderRepository).findById("zczc");
+        when(orderRepository.findById("unknown")).thenReturn(null);
 
-        assertNull(orderService.findById("zczc"));
+        Order result = orderService.findById("unknown");
+
+        assertNull(result);
     }
 
     @Test
-    void testFindAllByAuthorIfAuthorCorrect() {
-        Order order = orders.get(1);
+    void testFindAllByAuthorFound() {
 
-        doReturn(orders).when(orderRepository).findAllByAuthor(order.getAuthor());
+        List<Order> orders = new ArrayList<>();
+        orders.add(order);
+
+        when(orderRepository.findAllByAuthor(order.getAuthor())).thenReturn(orders);
 
         List<Order> results = orderService.findAllByAuthor(order.getAuthor());
 
-        for (Order result : results) {
-            assertEquals(order.getAuthor(), result.getAuthor());
-        }
-
-        assertEquals(2, results.size());
+        assertEquals(1, results.size());
+        assertEquals(order.getAuthor(), results.get(0).getAuthor());
     }
 
     @Test
-    void testFindAllByAuthorIfAllLowercase() {
-        Order order = orders.get(1);
+    void testFindAllByAuthorEmpty() {
 
-        doReturn(new ArrayList<Order>())
-                .when(orderRepository)
-                .findAllByAuthor(order.getAuthor().toLowerCase());
+        when(orderRepository.findAllByAuthor("unknown")).thenReturn(new ArrayList<>());
 
-        List<Order> results = orderService.findAllByAuthor(
-                order.getAuthor().toLowerCase()
-        );
+        List<Order> results = orderService.findAllByAuthor("unknown");
 
         assertTrue(results.isEmpty());
     }

@@ -61,7 +61,7 @@ class ProductControllerTest {
                         .param("productName", "Laptop")
                         .param("productQuantity", "10"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("list"));
+                .andExpect(redirectedUrl("/product/list"));
     }
 
     @Test

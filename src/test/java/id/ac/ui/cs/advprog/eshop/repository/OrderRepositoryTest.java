@@ -139,4 +139,12 @@ class OrderRepositoryTest {
 
         assertTrue(orderList.isEmpty());
     }
+
+    @Test
+    void testFindAllByAuthorIfEmpty() {
+
+        List<Order> result = orderRepository.findAllByAuthor("Nobody");
+
+        assertTrue(result.isEmpty());
+    }
 }

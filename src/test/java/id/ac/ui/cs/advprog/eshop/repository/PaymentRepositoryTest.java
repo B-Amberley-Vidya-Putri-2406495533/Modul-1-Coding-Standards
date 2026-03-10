@@ -6,27 +6,25 @@ import id.ac.ui.cs.advprog.eshop.model.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PaymentRepositoryTest {
 
-    PaymentRepository paymentRepository;
+    PaymentRepository repository;
+
     Payment payment;
 
     @BeforeEach
     void setUp() {
-        paymentRepository = new PaymentRepository();
+        repository = new PaymentRepository();
 
         List<Product> products = new ArrayList<>();
 
         Product product = new Product();
-        product.setProductId("product-1");
-        product.setProductName("Sample Product");
+        product.setProductId("p1");
+        product.setProductName("Sample");
         product.setProductQuantity(1);
 
         products.add(product);
@@ -34,32 +32,63 @@ class PaymentRepositoryTest {
         Order order = new Order(
                 "order-1",
                 products,
-                123456L,
+                1708560000L,
                 "Safira"
         );
 
-        Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "ESHOP1234ABC5678");
+        Map<String,String> data = new HashMap<>();
+        data.put("voucherCode","ESHOP1234ABC5678");
 
-        payment = new Payment(order, "VOUCHER_CODE", paymentData);
+        payment = new Payment(order,"VOUCHER_CODE",data);
     }
 
     @Test
-    void testSavePayment() {
-        Payment result = paymentRepository.save(payment);
+    void savePayment() {
+        Payment result = repository.save(payment);
+
         assertEquals(payment.getId(), result.getId());
     }
 
     @Test
-    void testFindPaymentById() {
-        paymentRepository.save(payment);
-        Payment result = paymentRepository.findById(payment.getId());
+    void findPaymentById() {
+        repository.save(payment);
+
+        Payment result = repository.findById(payment.getId());
+
         assertEquals(payment.getId(), result.getId());
     }
 
     @Test
-    void testFindAllPayments() {
-        paymentRepository.save(payment);
-        assertEquals(1, paymentRepository.findAll().size());
+    void findAllPayments() {
+        repository.save(payment);
+
+        List<Payment> result = repository.findAll();
+
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void findPaymentByIdNotFound() {
+
+        Payment result = repository.findById("unknown-id");
+
+        assertNull(result);
+    }
+
+    @Test
+    void findAllPaymentsMultiple() {
+
+        repository.save(payment);
+
+        Map<String,String> data = new HashMap<>();
+        data.put("voucherCode","ESHOP9999ABC9999");
+
+        Payment payment2 = new Payment(payment.getOrder(),"VOUCHER_CODE",data);
+
+        repository.save(payment2);
+
+        List<Payment> result = repository.findAll();
+
+        assertEquals(2,result.size());
     }
 }
