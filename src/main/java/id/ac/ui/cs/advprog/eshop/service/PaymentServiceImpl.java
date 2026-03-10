@@ -21,14 +21,36 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
-
         Payment payment = new Payment(order, method, paymentData);
 
-        if (VOUCHER_METHOD.equals(method)) {
-            handleVoucherPayment(payment, paymentData);
-        }
-        if (COD_METHOD.equals(method)) {
-            handleCODPayment(payment, paymentData);
+        if ("VOUCHER_CODE".equals(method)) {
+            String voucher = paymentData.get("voucherCode");
+
+            if (voucher != null &&
+                    voucher.length() == 16 &&
+                    voucher.startsWith("ESHOP") &&
+                    voucher.replaceAll("[^0-9]", "").length() == 8) {
+
+                payment.setStatus("SUCCESS");
+                order.setStatus(OrderStatus.SUCCESS.getValue());
+
+            } else {
+                payment.setStatus("REJECTED");
+                order.setStatus(OrderStatus.FAILED.getValue());
+            }
+        } else if ("CASH_ON_DELIVERY".equals(method)) {
+            String address = paymentData.get("address");
+            String deliveryFee = paymentData.get("deliveryFee");
+
+            if (address == null || address.isEmpty() ||
+                    deliveryFee == null || deliveryFee.isEmpty()) {
+
+                payment.setStatus("REJECTED");
+                order.setStatus(OrderStatus.FAILED.getValue());
+
+            } else {
+                payment.setStatus("PENDING");
+            }
         }
 
         paymentRepository.save(payment);
