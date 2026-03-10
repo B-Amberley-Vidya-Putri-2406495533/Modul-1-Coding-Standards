@@ -67,3 +67,36 @@ kelas dasar untuk setup umum, menggunakan helper method, dan mengurangi duplikas
    pulls the latest code and redeploys the application.
 
 **LINK DEPLOYMENT:** https://dependent-haleigh-b-amberley-vidya-putri-2406495533-665252ef.koyeb.app/
+
+----
+### REFLEKSI MODULE 4
+**1. Reflection on Test-Driven Development (TDD)**
+
+During this exercise, I practiced using the Test-Driven Development (TDD) workflow where tests are written 
+before implementing the code. According to Percival (2017), testing helps developers clarify expected behavior
+and ensure that changes to the system do not introduce errors.
+
+From my experience, TDD helped me better understand the requirements before writing the implementation.
+By writing tests first, I needed to think about what the program should do and how different cases should 
+behave. This made the development process more structured and helped reduce mistakes.
+
+Another advantage of TDD is that it makes refactoring safer. Since tests already exist, I can run them 
+after making changes to ensure that the existing functionality still works correctly.
+
+However, I also found that following TDD consistently requires discipline. Sometimes it feels easier to 
+write the implementation first and add tests afterward. In the future, I should try to follow the 
+Red–Green–Refactor cycle more consistently to ensure that testing remains an early part of development.
+
+
+
+**2. Reflection on the F.I.R.S.T Principles**
+
+The unit tests created in this tutorial generally follow the F.I.R.S.T principles, which describe the
+characteristics of good tests.
+
+The tests are Fast because they run quickly without relying on external systems. They are Independent, 
+meaning each test can run separately without depending on other tests. They are also Repeatable, since they produce consistent results when run multiple times. The tests are Self-validating, because assertions automatically determine whether the tests pass or fail. Finally, they are Timely, as the tests were written during the development process.
+
+Even though the tests follow these principles, there are still areas for improvement. For example, 
+I can add more edge case tests and use clearer test names to make the purpose of each test easier 
+to understand. In the future, I will try to improve test coverage and maintain better test structure.
