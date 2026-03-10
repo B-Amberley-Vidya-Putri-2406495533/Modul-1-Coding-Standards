@@ -147,4 +147,54 @@ class OrderTest {
         assertEquals("Builder Test", order.getAuthor());
         assertEquals(OrderStatus.SUCCESS.getValue(), order.getStatus());
     }
+
+    @Test
+    void testOrderBuilderDefaultStatus() {
+
+        List<Product> builderProducts = new ArrayList<>();
+
+        Product product = new Product();
+        product.setProductId("builder-product");
+        product.setProductName("Builder Product");
+        product.setProductQuantity(1);
+
+        builderProducts.add(product);
+
+        Order order = Order.builder()
+                .id("order-builder-2")
+                .products(builderProducts)
+                .orderTime(111L)
+                .author("Builder Default")
+                .status(OrderStatus.WAITING_PAYMENT.getValue())
+                .build();
+
+        assertEquals("order-builder-2", order.getId());
+        assertEquals(builderProducts, order.getProducts());
+        assertEquals(111L, order.getOrderTime());
+        assertEquals("Builder Default", order.getAuthor());
+        assertEquals(OrderStatus.WAITING_PAYMENT.getValue(), order.getStatus());
+    }
+
+    @Test
+    void testOrderBuilderToString() {
+
+        List<Product> builderProducts = new ArrayList<>();
+
+        Product product = new Product();
+        product.setProductId("builder-product");
+        product.setProductName("Builder Product");
+        product.setProductQuantity(1);
+
+        builderProducts.add(product);
+
+        String result = Order.builder()
+                .id("order-builder")
+                .products(builderProducts)
+                .orderTime(1L)
+                .author("Tester")
+                .status(OrderStatus.WAITING_PAYMENT.getValue())
+                .toString();
+
+        assertNotNull(result);
+    }
 }

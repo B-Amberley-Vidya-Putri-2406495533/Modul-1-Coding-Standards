@@ -51,13 +51,9 @@ class PaymentServiceImplTest {
         paymentData = new HashMap<>();
     }
 
-    // ---------------- VOUCHER ----------------
-
     @Test
     void testAddPaymentVoucherValid() {
-
         paymentData.put("voucherCode", "ESHOP1234ABC5678");
-
         Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
 
         assertEquals("SUCCESS", payment.getStatus());
@@ -68,7 +64,6 @@ class PaymentServiceImplTest {
 
     @Test
     void testAddPaymentVoucherInvalid() {
-
         paymentData.put("voucherCode", "INVALID");
 
         Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
@@ -81,7 +76,6 @@ class PaymentServiceImplTest {
 
     @Test
     void testAddPaymentVoucherNullCode() {
-
         Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
 
         assertEquals("REJECTED", payment.getStatus());
@@ -90,11 +84,8 @@ class PaymentServiceImplTest {
         verify(paymentRepository).save(payment);
     }
 
-    // ---------------- COD ----------------
-
     @Test
     void testAddPaymentCashOnDeliveryValid() {
-
         paymentData.put("address", "Jakarta");
         paymentData.put("deliveryFee", "10000");
 
@@ -107,7 +98,6 @@ class PaymentServiceImplTest {
 
     @Test
     void testAddPaymentCODInvalidAddress() {
-
         paymentData.put("address", "");
         paymentData.put("deliveryFee", "10000");
 
@@ -121,7 +111,6 @@ class PaymentServiceImplTest {
 
     @Test
     void testAddPaymentCODInvalidDeliveryFee() {
-
         paymentData.put("address", "Jakarta");
         paymentData.put("deliveryFee", "");
 
@@ -134,7 +123,6 @@ class PaymentServiceImplTest {
 
     @Test
     void testAddPaymentCODNullAddress() {
-
         paymentData.put("deliveryFee", "10000");
 
         Payment payment = paymentService.addPayment(order, "CASH_ON_DELIVERY", paymentData);
@@ -146,7 +134,6 @@ class PaymentServiceImplTest {
 
     @Test
     void testAddPaymentCODNullDeliveryFee() {
-
         paymentData.put("address", "Jakarta");
 
         Payment payment = paymentService.addPayment(order, "CASH_ON_DELIVERY", paymentData);
@@ -156,11 +143,8 @@ class PaymentServiceImplTest {
         verify(paymentRepository).save(payment);
     }
 
-    // ---------------- OTHER METHOD ----------------
-
     @Test
     void testAddPaymentUnknownMethod() {
-
         Payment payment = paymentService.addPayment(order, "UNKNOWN", paymentData);
 
         assertNotNull(payment);
@@ -168,11 +152,8 @@ class PaymentServiceImplTest {
         verify(paymentRepository).save(payment);
     }
 
-    // ---------------- STATUS ----------------
-
     @Test
     void testSetStatusSuccess() {
-
         Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
 
         paymentService.setStatus(payment, "SUCCESS");
@@ -182,7 +163,6 @@ class PaymentServiceImplTest {
 
     @Test
     void testSetStatusRejected() {
-
         Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
 
         paymentService.setStatus(payment, "REJECTED");
@@ -192,7 +172,6 @@ class PaymentServiceImplTest {
 
     @Test
     void testSetStatusOtherValue() {
-
         Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
 
         paymentService.setStatus(payment, "PENDING");
@@ -200,17 +179,13 @@ class PaymentServiceImplTest {
         assertEquals("PENDING", payment.getStatus());
     }
 
-    // ---------------- REPOSITORY ----------------
-
     @Test
     void testGetPayment() {
 
         Payment payment = new Payment(order, "VOUCHER_CODE", paymentData);
-
         when(paymentRepository.findById(payment.getId())).thenReturn(payment);
 
         Payment result = paymentService.getPayment(payment.getId());
-
         assertEquals(payment.getId(), result.getId());
     }
 
@@ -218,9 +193,39 @@ class PaymentServiceImplTest {
     void testGetAllPayments() {
 
         when(paymentRepository.findAll()).thenReturn(List.of());
-
         List<Payment> payments = paymentService.getAllPayments();
 
         assertTrue(payments.isEmpty());
+    }
+
+    @Test
+    void testAddPaymentVoucherInvalidLength() {
+        paymentData.put("voucherCode", "ESHOP123");
+
+        Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+        assertEquals("REJECTED", payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), order.getStatus());
+        verify(paymentRepository).save(payment);
+    }
+
+    @Test
+    void testAddPaymentVoucherInvalidPrefix() {
+        paymentData.put("voucherCode", "WRONG12345678ABC");
+
+        Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+        assertEquals("REJECTED", payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), order.getStatus());
+        verify(paymentRepository).save(payment);
+    }
+
+    @Test
+    void testAddPaymentVoucherInvalidDigitCount() {
+        paymentData.put("voucherCode", "ESHOPABCDEFGHIJK");
+
+        Payment payment = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+
+        assertEquals("REJECTED", payment.getStatus());
+        assertEquals(OrderStatus.FAILED.getValue(), order.getStatus());
+        verify(paymentRepository).save(payment);
     }
 }

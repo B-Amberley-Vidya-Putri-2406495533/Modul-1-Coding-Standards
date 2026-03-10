@@ -91,4 +91,14 @@ class PaymentRepositoryTest {
 
         assertEquals(2,result.size());
     }
+
+    @Test
+    void findPaymentByIdExistingButDifferentId() {
+
+        repository.save(payment);
+
+        Payment result = repository.findById("different-id");
+
+        assertNull(result);
+    }
 }
