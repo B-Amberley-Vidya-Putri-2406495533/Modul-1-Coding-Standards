@@ -2,7 +2,6 @@ package id.ac.ui.cs.advprog.eshop.controller;
 
 import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.service.ProductService;
-import id.ac.ui.cs.advprog.eshop.service.CarServiceImpl;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +24,6 @@ class ProductControllerTest {
     @MockBean
     private ProductService service;
 
-    @MockBean
-    private CarServiceImpl carService;
 
     @Test
     void productList_success() throws Exception {
@@ -61,7 +58,7 @@ class ProductControllerTest {
                         .param("productName", "Laptop")
                         .param("productQuantity", "10"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("list"));
+                .andExpect(redirectedUrl("/product/list"));
     }
 
     @Test
