@@ -3,6 +3,7 @@ package id.ac.ui.cs.advprog.eshop.service;
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.enums.OrderStatus;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
+import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.repository.PaymentRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -34,12 +36,23 @@ class PaymentServiceImplTest {
 
     @BeforeEach
     void setUp() {
+
+        List<Product> products = new ArrayList<>();
+
+        Product product = new Product();
+        product.setProductId("product-1");
+        product.setProductName("Sample Product");
+        product.setProductQuantity(1);
+
+        products.add(product);
+
         order = new Order(
                 "order-1",
-                null,
+                products,
                 1708560000L,
                 "Safira"
         );
+
         paymentData = new HashMap<>();
     }
 
