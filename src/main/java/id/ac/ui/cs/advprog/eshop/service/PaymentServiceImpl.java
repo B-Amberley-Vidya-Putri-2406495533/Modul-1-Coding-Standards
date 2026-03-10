@@ -13,6 +13,9 @@ import java.util.Map;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
+    private static final String VOUCHER_METHOD = "VOUCHER_CODE";
+    private static final String COD_METHOD = "CASH_ON_DELIVERY";
+
     @Autowired
     private PaymentRepository paymentRepository;
 
@@ -21,38 +24,43 @@ public class PaymentServiceImpl implements PaymentService {
 
         Payment payment = new Payment(order, method, paymentData);
 
-        if (method.equals("VOUCHER_CODE")) {
-
-            String voucher = paymentData.get("voucherCode");
-
-            if (voucher != null &&
-                    voucher.length() == 16 &&
-                    voucher.startsWith("ESHOP") &&
-                    voucher.replaceAll("[^0-9]", "").length() == 8) {
-
-                payment.setStatus("SUCCESS");
-
-            } else {
-                payment.setStatus("REJECTED");
-            }
-
-        } else if (method.equals("CASH_ON_DELIVERY")) {
-
-            String address = paymentData.get("address");
-            String fee = paymentData.get("deliveryFee");
-
-            if (address == null || address.isEmpty() ||
-                    fee == null || fee.isEmpty()) {
-
-                payment.setStatus("REJECTED");
-
-            } else {
-                payment.setStatus("PENDING");
-            }
+        if (VOUCHER_METHOD.equals(method)) {
+            handleVoucherPayment(payment, paymentData);
+        }
+        if (COD_METHOD.equals(method)) {
+            handleCODPayment(payment, paymentData);
         }
 
         paymentRepository.save(payment);
         return payment;
+    }
+
+    private void handleVoucherPayment(Payment payment, Map<String, String> paymentData) {
+        String voucher = paymentData.get("voucherCode");
+
+        if (voucher != null &&
+                voucher.length() == 16 &&
+                voucher.startsWith("ESHOP") &&
+                voucher.replaceAll("[^0-9]", "").length() == 8) {
+            payment.setStatus("SUCCESS");
+        } else {
+            payment.setStatus("REJECTED");
+        }
+    }
+
+    private void handleCODPayment(Payment payment, Map<String, String> paymentData) {
+
+        String address = paymentData.get("address");
+        String deliveryFee = paymentData.get("deliveryFee");
+
+        if (address == null || address.isEmpty() ||
+                deliveryFee == null || deliveryFee.isEmpty()) {
+
+            payment.setStatus("REJECTED");
+
+        } else {
+            payment.setStatus("PENDING");
+        }
     }
 
     @Override
@@ -60,11 +68,10 @@ public class PaymentServiceImpl implements PaymentService {
 
         payment.setStatus(status);
 
-        if (status.equals("SUCCESS")) {
+        if ("SUCCESS".equals(status)) {
             payment.getOrder().setStatus(OrderStatus.SUCCESS.getValue());
         }
-
-        if (status.equals("REJECTED")) {
+        if ("REJECTED".equals(status)) {
             payment.getOrder().setStatus(OrderStatus.FAILED.getValue());
         }
 
